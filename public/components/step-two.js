@@ -3,6 +3,7 @@ import Ajax from 'simple-ajax'
 import offset from 'document-offset'
 
 class StepTwo extends React.Component {
+
   constructor(){
     super()
     this.start = this.start.bind(this)
@@ -21,7 +22,8 @@ class StepTwo extends React.Component {
       clientID: this.props.clientID,
       clientSecret: this.props.clientSecret,
       server: this.props.server,
-      tokenEndpoint: this.props.tokenEndpoint
+      tokenEndpoint: this.props.tokenEndpoint,
+      cookie: this.props.cookieData
     }
 
     if(this.props.audience && this.props.audience !== '') {
@@ -109,9 +111,10 @@ class StepTwo extends React.Component {
                   <br />
                   &amp;client_secret=<a onClick={() => { this.props.openModal(true, 'clientSecret') }} href="#">{this.props.clientSecret}</a>
                   <br />
-                  &amp;redirect_uri=https://openidconnect.net/callback
+                  &amp;redirect_uri=http://127.0.0.1:5000/callback
                   <br />
                   &amp;code={this.props.authCode}
+
 
                   {this.props.audience&& <br/>}
                   {this.props.audience&& '&audience='}

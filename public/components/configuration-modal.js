@@ -15,6 +15,7 @@ const ConfigurationModal = (props) =>
 
         <ServerURLs
           discoveryURL={props.discoveryURL}
+          cookieData={props.cookieData}
           authEndpoint={props.authEndpoint}
           tokenEndpoint={props.tokenEndpoint}
           tokenKeysEndpoint={props.tokenKeysEndpoint}

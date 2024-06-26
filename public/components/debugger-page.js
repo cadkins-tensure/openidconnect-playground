@@ -137,6 +137,7 @@ class DebuggerPage extends React.Component {
           this.state.server !== 'custom') {
         this.setState({
           discoveryURL: '',
+          cookieData: '',
           authEndpoint: '',
           tokenEndpoint: '',
           tokenKeysEndpoint: '',
@@ -261,7 +262,7 @@ class DebuggerPage extends React.Component {
       window.dispatchEvent(new CustomEvent('logOut'));
       if (this.state.server === 'Auth0') {
         window.location.href = `https://${this.state.domain}/v2/logout?client_id=${this.state.clientID}&returnTo=${encodeURIComponent(window.location.origin)}`;
-      }  
+      }
     }.bind(this))
   }
 
@@ -317,6 +318,7 @@ class DebuggerPage extends React.Component {
                   skipTutorial={ () => { this.setStep(4); }}
                   isActive={ this.state.currentStep === 1 }
                   scrollAnimated={this.scrollAnimated}
+                  cookieData = {this.state.cookieData}
                 />
                 : null
               }
@@ -333,6 +335,7 @@ class DebuggerPage extends React.Component {
                   nextStep={ () => { this.setStep(3); } }
                   isActive={ this.state.currentStep === 2 }
                   scrollAnimated={this.scrollAnimated}
+                  cookieData={this.state.cookieData}
                 />
                 : null
               }
@@ -346,6 +349,7 @@ class DebuggerPage extends React.Component {
                   server= {this.state.server}
                   tokenKeysEndpoint= {this.state.tokenKeysEndpoint}
                   isActive={ this.state.currentStep === 3 }
+                  cookieData={this.state.cookieData}
                 />
                 : null
               }
@@ -366,6 +370,7 @@ class DebuggerPage extends React.Component {
           <ConfigurationModal ref="config"
             closeModal={ () => { this.openConfigurationModal(false); } }
             discoveryURL={this.state.discoveryURL}
+            cookieData={this.state.cookieData}
             authEndpoint={this.state.authEndpoint}
             tokenEndpoint={this.state.tokenEndpoint}
             tokenKeysEndpoint={this.state.tokenKeysEndpoint}
