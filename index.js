@@ -4,7 +4,9 @@ const crypto = require("crypto");
 const request = require("request");
 const jwt = require("jsonwebtoken");
 const jwkToPem = require("jwk-to-pem");
+const { header } = require('request/lib/hawk');
 const Validator = require("jsonschema").Validator;
+const REDIRECT_URI = "http://127.0.0.1:5000/callback";
 require("dotenv").config({ silent: true });
 
 const app = express();
@@ -120,7 +122,7 @@ app.get("*", (req, res) => {
   }
   res.render("index", {
     code,
-    redirect_uri: process.env.REDIRECT_URI,
+    redirect_uri: REDIRECT_URI,
     state: crypto.randomBytes(20).toString("hex"),
     clientId: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
@@ -137,24 +139,48 @@ app.post("/code_to_token", (req, res) => {
     client_id: req.body.clientID,
     client_secret: req.body.clientSecret,
     grant_type: "authorization_code",
-    redirect_uri: process.env.REDIRECT_URI,
+    redirect_uri: REDIRECT_URI,
+    XDEBUG_SESSION_START: "start",
+    //scope: "openid"
   };
 
-  request.post(
-    req.body.tokenEndpoint,
-    {
-      form: reqData,
-    },
-    (err, response, body) => {
-      result.body = body;
-      result.response = response;
-      // and add the decoded token
+  console.log("==================>", req.body.cookie);
+
+  const headerData = {
+    // eslint-disable-next-line max-len,quote-props
+    'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+    // eslint-disable-next-line max-len,quote-props
+    'Cookie': req.body.cookie
+  };
+  const mData = {
+    headers: headerData,
+    form: reqData
+  };
+  console.log(mData);
+  const options = {
+    // eslint-disable-next-line quote-props
+    'method': 'POST',
+    // eslint-disable-next-line quote-props
+    'url': req.body.tokenEndpoint,
+    // eslint-disable-next-line quote-props
+    'headers': headerData,
+    formData: reqData
+  };
+  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
+  request(options, (error, response) => {
+    result.body = response.body;
+    result.response = response;
+    if (error) {
+      console.log(error);
+    } else {
       result.decodedToken = JSON.stringify(
-        jwt.decode(result.id_token, { complete: true }),
+        jwt.decode(JSON.parse(response.body).id_token, { complete: true }),
       );
-      res.json(result);
-    },
-  );
+    }
+    console.log(result);
+
+    res.json(result);
+  });
 });
 
 app.post("/validate", (req, res) => {
